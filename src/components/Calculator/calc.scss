@@ -2,6 +2,9 @@ section {
     padding-top: 10%;
     width: max-content;
     margin: auto;
+    input {
+        text-align: right;
+    }
     div {
         .button-row {
             display: flex;

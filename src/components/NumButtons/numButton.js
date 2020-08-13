@@ -1,12 +1,22 @@
 import React from 'react';
 import './numButton.scss';
 
-const NumButton = props => {
-    return (
-        <div className="numButton-style">
-            {props.number}
-        </div>
-    )
-}
+export default class NumButton extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {};
+    }
 
-export default NumButton;
+    render() {
+        return (
+            <div
+                className="numButton-style"
+                value={this.props.number}
+                // onClick={event => { this.props.callback(event); }}
+                onClick={(event) => {this.props.handleClick(event);}}
+            >
+                {this.props.number}
+            </div>
+        );
+    }
+}

@@ -1,41 +1,68 @@
 import React, { Component } from 'react';
+// import React from 'react';
 import NumButton from '../NumButtons/numButton';
 import './calc.scss';
 
-class Calculator extends Component {
-    state = {
-        number: [7, 8, 9, 6, 5, 4, 3, 2, 1, 0]
+export default class Calculator extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            screen: "",
+            savedValue:"",
+        };
     }
+
+    handleClick = (event) => {
+        let btnValue = event.target.getAttribute("value");
+
+        // console.log("button press works!");
+        console.log(btnValue);
+        this.setState(
+            { screen: this.state.screen + btnValue }
+        );
+        // document.getElementById("inputVal").setValue("placeholder", this.state.screen + btnValue);
+    }
+
+    clearField = (event) => {
+        this.setState({screen:""});
+    }
+
     render() {
         return (
             <section>
-                <input type="text" placeholder="0" maxLength="64"></input>
+                <input
+                    id="inputVal"
+                    type="text"
+                    value={this.state.screen}
+                    onChange={e => {console.log(this.state.screen); this.setState({ screen: e.target.value })}}
+                    placeholder=""
+                    maxLength="64"
+                >
+                </input>
                 <div>
                     <div className="button-row">
-                        <NumButton number="7" />
-                        <NumButton number="8" />
-                        <NumButton number="9" />
+                        <NumButton number="7" handleClick={this.handleClick} />
+                        <NumButton number="8" handleClick={this.handleClick} />
+                        <NumButton number="9" handleClick={this.handleClick} />
                     </div>
                     <div className="button-row">
-                        <NumButton number="4" />
-                        <NumButton number="5" />
-                        <NumButton number="6" />
+                        <NumButton number="4" handleClick={this.handleClick} />
+                        <NumButton number="5" handleClick={this.handleClick} />
+                        <NumButton number="6" handleClick={this.handleClick} />
                     </div>
                     <div className="button-row">
-                        <NumButton number="1" />
-                        <NumButton number="2" />
-                        <NumButton number="3" />
+                        <NumButton number="1" handleClick={this.handleClick} />
+                        <NumButton number="2" handleClick={this.handleClick} />
+                        <NumButton number="3" handleClick={this.handleClick} />
                     </div>
                     <div className="button-row">
-                        <NumButton number="0" />
+                        <NumButton number="0" handleClick={this.handleClick} />
+                        <NumButton number="C" handleClick={this.clearField} />
+                        <NumButton number="+" handleClick={this.math} />
+
                     </div>
                 </div>
             </section>
         )
     }
 }
-
-export default Calculator;                 
-                 
-                 
-                 
