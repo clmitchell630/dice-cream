@@ -28,3 +28,30 @@ test('parser', () => {
   */
 
 });
+
+
+test('Dice', () => {
+  let min = 100000;
+  let max = 0;
+  for (let i = 0; i < 9999; i++) {
+    let roll = parseInt(Parser.evalDice("1d100"));
+    min = roll < min ? min = roll : min;
+    max = roll > max ? max = roll : max;
+  }
+  console.log(`Min roll = ${min}, Max roll = ${max}`);
+  expect(min).toEqual(1);
+  expect(max).toEqual(100);
+});
+
+test('Dice Math', () => {
+  let min = 100000;
+  let max = 0;
+  for (let i = 0; i < 9999; i++) {
+    let roll = parseInt(Parser.evaluate(Parser.evalDice("1d20+1d20")));
+    min = roll < min ? min = roll : min;
+    max = roll > max ? max = roll : max;
+  }
+  console.log(`Min roll = ${min}, Max roll = ${max}`);
+  expect(min).toEqual(2);
+  expect(max).toEqual(40);
+});
