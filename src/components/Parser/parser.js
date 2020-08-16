@@ -17,6 +17,7 @@ let diceMatch = /(?<count>\d*)d(?<faces>\d+)(?<dropkeep>(?<dk>[dk])(?<lh>[lh])(?
 
 export function evalDice(str) {
     str = str.replace(/\s+/g, "");
+    // console.log(`---- EVAL DICE ---- ${str}`);
     let matched = false;
     /* Replace a matched die string with a rolled die */
     let remaining = str.replace(diceMatch, (match, groups, offset, orig) => {
@@ -26,14 +27,14 @@ export function evalDice(str) {
     if (matched) {
         str = evalDice(remaining);
     } else {
-        console.log(str);
+        // console.log(str);
     }
     return str;
 }
 
 function rollDie(str) {
     let matches = str.match(diceMatch);
-    console.log(matches.groups);
+    // console.log(matches.groups);
     let count = parseInt(matches.groups.count) || 1;
     let faces = parseInt(matches.groups.faces);
     let rolls = [];
@@ -42,8 +43,12 @@ function rollDie(str) {
     }
     if (matches.groups.dk) {
         rolls.sort((a, b) => a - b);
-        console.log("Sorted Rolls ", rolls);
+        // console.log("Sorted Rolls ", rolls);
         let dkNum = parseInt(matches.groups.dknum);
+        if (dkNum >= count) {
+            /* Can't drop/keep (more than) all the dice! */
+            throw new Error (`Cannot drop/keep '${dkNum}' out of '${count}' dice!`);
+        };
         switch (matches.groups.dk + matches.groups.lh) {
             case 'dl':
                 rolls.splice(0, dkNum);
@@ -59,7 +64,7 @@ function rollDie(str) {
                 break;
         }
     }
-    console.log("Rolls ", rolls);
+    // console.log("Rolls ", rolls);
     return rolls.reduce((a, b) => { return a + b; });
 }
 
@@ -77,6 +82,7 @@ function _evaluate(str) {
         let lastParen = found.index + found[0].length - 1;
         // console.log(`${ind}`, found);
         if (firstParen >= 0 && lastParen > firstParen) {
+
             str = str.slice(0, firstParen) + _evaluate(str.slice(firstParen + 1, lastParen)) + str.substr(lastParen + 1);
             // console.log(`${ind}newstr -- ${str}`);
             str = _evaluate(str);

@@ -36,34 +36,46 @@ test("DropKeep", () => {
   Parser.evalDice("10d20kh2");
 });
 
-test('Dice', () => {
+test('OnlyDice', () => {
   let min = 100000;
   let max = 0;
   let roll;
-  for (let i = 0; i < 9999; i++) {
-    roll = parseInt(Parser.evalDice("1d100"));
+  for (let i = 0; i < 999; i++) {
+    roll = parseInt(Parser.evalDice("1d20"));
     min = roll < min ? min = roll : min;
     max = roll > max ? max = roll : max;
   }
   console.log(`Min roll = ${min}, Max roll = ${max}`);
   expect(min).toEqual(1);
-  expect(max).toEqual(100);
+  expect(max).toEqual(20);
 
-  
   for (let i = 0; i < 999; i++) {
     roll = parseInt(Parser.evalDice("d20"));
-    expect(roll >= 1 && roll<=20).toEqual(true);
+    expect(roll >= 1 && roll <= 20).toEqual(true);
     roll = parseInt(Parser.evalDice("1d20"));
-    expect(roll >= 1 && roll<=20).toEqual(true);
-    roll = parseInt(Parser.evalDice("1d20dh1"));
-    expect(roll >= 1 && roll<=20).toEqual(true);
-    roll = parseInt(Parser.evalDice("1d20dl1"));
-    expect(roll >= 1 && roll<=20).toEqual(true);
-    roll = parseInt(Parser.evalDice("1d20kh1"));
-    expect(roll >= 1 && roll<=20).toEqual(true);
-    roll = parseInt(Parser.evalDice("1d20kl1"));
-    expect(roll >= 1 && roll<=20).toEqual(true);
+    expect(roll >= 1 && roll <= 20).toEqual(true);
+    roll = parseInt(Parser.evalDice("2d20dh1"));
+    expect(roll >= 1 && roll <= 20).toEqual(true);
+    roll = parseInt(Parser.evalDice("2d20dl1"));
+    expect(roll >= 1 && roll <= 20).toEqual(true);
+    roll = parseInt(Parser.evalDice("2d20kh1"));
+    expect(roll >= 1 && roll <= 20).toEqual(true);
+    roll = parseInt(Parser.evalDice("2d20kl1"));
+    expect(roll >= 1 && roll <= 20).toEqual(true);
   }
+
+  expect(() => {
+    Parser.evalDice("2d20dh2")
+  }).toThrow();
+  expect(() => {
+    Parser.evalDice("2d20dl2")
+  }).toThrow();
+  expect(() => {
+    Parser.evalDice("2d20kh2")
+  }).toThrow();
+  expect(() => {
+    Parser.evalDice("2d20kl2")
+  }).toThrow();
 });
 
 test('Dice Math', () => {
