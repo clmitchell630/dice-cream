@@ -18,30 +18,49 @@ let diceMatch = /(?<count>\d*)d(?<faces>\d+)(?<dropkeep>(?<dk>[dk])(?<lh>[lh])(?
 export function evalDice(str) {
     str = str.replace(/\s+/g, "");
     let matched = false;
+    /* Replace a matched die string with a rolled die */
     let remaining = str.replace(diceMatch, (match, groups, offset, orig) => {
-        // console.log(match);
         matched = true;
         return rollDie(match);
     });
     if (matched) {
-        // console.log(remaining);
         str = evalDice(remaining);
     } else {
-        // console.log(str);
+        console.log(str);
     }
     return str;
 }
 
 function rollDie(str) {
     let matches = str.match(diceMatch);
-    // console.log(matches.groups);
+    console.log(matches.groups);
     let count = parseInt(matches.groups.count) || 1;
     let faces = parseInt(matches.groups.faces);
-    let roll = [];
+    let rolls = [];
     for (let i = 0; i < count; i++) {
-        roll.push(Math.ceil(Math.random() * faces));
+        rolls.push(Math.ceil(Math.random() * faces));
     }
-    return roll.reduce((a, b) => { return a + b; });
+    if (matches.groups.dk) {
+        rolls.sort((a, b) => a - b);
+        console.log("Sorted Rolls ", rolls);
+        let dkNum = parseInt(matches.groups.dknum);
+        switch (matches.groups.dk + matches.groups.lh) {
+            case 'dl':
+                rolls.splice(0, dkNum);
+                break;
+            case 'dh':
+                rolls.splice(0 - dkNum);
+                break;
+            case 'kl':
+                rolls.splice(dkNum);
+                break;
+            case 'kh':
+                rolls.splice(0, rolls.length - dkNum);
+                break;
+        }
+    }
+    console.log("Rolls ", rolls);
+    return rolls.reduce((a, b) => { return a + b; });
 }
 
 function _evaluate(str) {
