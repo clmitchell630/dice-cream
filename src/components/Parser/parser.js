@@ -1,33 +1,46 @@
 
-function eval_parens(str) {
 
-}
+let beforeRE = /(?<=^|[\(\+\-\*\/])/;
+let afterRE = /(?=[\+\-\*\/\)]|$)/;
 
 let indent = 0;
 let indent_mult = 4;
 
 export function evaluate(str) {
     str = str.replace(/\s+/g, "");
-    // console.log(`---- EVAL ---- ${str}`);
+    console.log(`---- EVAL ---- ${str}`);
     indent = 0;
-    return _evaluate(str);
+    let result = _evaluate(evalDice(str));
+    if (!!Number(result)) {
+        return result;
+    } else {
+        throw new Error (`Did not evaluate to a number: '${result}`);
+    }
 }
 
-let diceMatch = /(?<count>\d*)d(?<faces>\d+)(?<dropkeep>(?<dk>[dk])(?<lh>[lh])(?<dknum>\d+))?/;
+let operators = '+-*/';
+operators.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+console.log(operators);
+let dieRE = /(?<count>\d*)d(?<faces>\d+)(?<dropkeep>(?<dk>[dk])(?<lh>[lh])(?<dknum>\d+))?/;
+let diceMatch = new RegExp(beforeRE.source + dieRE.source + afterRE.source);
+// let diceMatch = /(?<=^|[\+\-\*\/])(?<count>\d*)d(?<faces>\d+)(?<dropkeep>(?<dk>[dk])(?<lh>[lh])(?<dknum>\d+))?(?=[\+\-\*\/]|$)/;
 
 export function evalDice(str) {
     str = str.replace(/\s+/g, "");
-    // console.log(`---- EVAL DICE ---- ${str}`);
+    console.log(`     EVAL DICE ---- ${str}`);
     let matched = false;
     /* Replace a matched die string with a rolled die */
     let remaining = str.replace(diceMatch, (match, groups, offset, orig) => {
         matched = true;
-        return rollDie(match);
+        let roll = rollDie(match);
+        console.log(`     ${match} -> ${roll}`);
+        return roll;
     });
     if (matched) {
         str = evalDice(remaining);
     } else {
-        // console.log(str);
+        console.log(`No more dice found: '${str}'`);
+        // throw new Error (`Invalid die syntax: '${str}'`);
     }
     return str;
 }
@@ -47,7 +60,7 @@ function rollDie(str) {
         let dkNum = parseInt(matches.groups.dknum);
         if (dkNum >= count) {
             /* Can't drop/keep (more than) all the dice! */
-            throw new Error (`Cannot drop/keep '${dkNum}' out of '${count}' dice!`);
+            throw new Error(`Cannot drop/keep '${dkNum}' out of '${count}' dice!`);
         };
         switch (matches.groups.dk + matches.groups.lh) {
             case 'dl':
@@ -62,21 +75,27 @@ function rollDie(str) {
             case 'kh':
                 rolls.splice(0, rolls.length - dkNum);
                 break;
+            default:
+                throw new Error(`Invalid drop/keep`);
         }
     }
     // console.log("Rolls ", rolls);
     return rolls.reduce((a, b) => { return a + b; });
 }
 
+let parensRE = new RegExp(beforeRE.source + /\([^\(\)]*\)/.source + afterRE.source);
+let multiRE = new RegExp(beforeRE.source + /(\d+)([\*\/])(\d+)/.source + afterRE.source);
+let addRE = new RegExp(beforeRE.source + /(\d+)([\+\-])(\d+)/.source + afterRE.source);
+
 function _evaluate(str) {
     indent += indent_mult;
     let ind = ' '.repeat(indent);
-    // console.log(`${ind}PARSING -- ${str}`);
+    console.log(`${ind}PARSING -- ${str}`);
 
     let found;
 
     /* Solve Parenthesis */
-    found = str.match(/\([^\(\)]*\)/);
+    found = str.match(parensRE);
     if (found) {
         let firstParen = found.index;
         let lastParen = found.index + found[0].length - 1;
@@ -91,9 +110,9 @@ function _evaluate(str) {
 
     let val;
     /* Solve Multiplication and Division */
-    found = str.match(/(\d+)([\*\/])(\d+)/);
+    found = str.match(multiRE);
     if (found) {
-        // console.log(`${ind}${found}`);
+        console.log(`${ind}${found}`);
         switch (found[2]) {
             case '*':
                 val = parseInt(found[1]) * parseInt(found[3]);
@@ -108,9 +127,9 @@ function _evaluate(str) {
     }
 
     /* Solve Addition and Subtraction */
-    found = str.match(/(\d+)([\+\-])(\d+)/);
+    found = str.match(addRE);
     if (found) {
-        // console.log(`${ind}${found}`);
+        console.log(`${ind}${found}`);
         switch (found[2]) {
             case '+':
                 val = parseInt(found[1]) + parseInt(found[3]);
@@ -124,7 +143,7 @@ function _evaluate(str) {
         str = _evaluate(newstr);
     }
 
-    // console.log(`${ind}RETURNING -- ${str}`);
+    console.log(`${ind}RETURNING -- ${str}`);
     indent -= indent_mult;
     return str;
 }
