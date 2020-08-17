@@ -8,7 +8,7 @@ let indent_mult = 4;
 
 export function evaluate(str) {
     str = str.replace(/\s+/g, "");
-    console.log(`---- EVAL ---- ${str}`);
+    // console.log(`---- EVAL ---- ${str}`);
     indent = 0;
     let result = _evaluate(evalDice(str));
     if (!!Number(result)) {
@@ -18,28 +18,24 @@ export function evaluate(str) {
     }
 }
 
-let operators = '+-*/';
-operators.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-console.log(operators);
 let dieRE = /(?<count>\d*)d(?<faces>\d+)(?<dropkeep>(?<dk>[dk])(?<lh>[lh])(?<dknum>\d+))?/;
 let diceMatch = new RegExp(beforeRE.source + dieRE.source + afterRE.source);
-// let diceMatch = /(?<=^|[\+\-\*\/])(?<count>\d*)d(?<faces>\d+)(?<dropkeep>(?<dk>[dk])(?<lh>[lh])(?<dknum>\d+))?(?=[\+\-\*\/]|$)/;
 
-export function evalDice(str) {
+function evalDice(str) {
     str = str.replace(/\s+/g, "");
-    console.log(`     EVAL DICE ---- ${str}`);
+    // console.log(`     EVAL DICE ---- ${str}`);
     let matched = false;
     /* Replace a matched die string with a rolled die */
     let remaining = str.replace(diceMatch, (match, groups, offset, orig) => {
         matched = true;
         let roll = rollDie(match);
-        console.log(`     ${match} -> ${roll}`);
+        // console.log(`     ${match} -> ${roll}`);
         return roll;
     });
     if (matched) {
         str = evalDice(remaining);
     } else {
-        console.log(`No more dice found: '${str}'`);
+        // console.log(`No more dice found: '${str}'`);
         // throw new Error (`Invalid die syntax: '${str}'`);
     }
     return str;
@@ -90,7 +86,7 @@ let addRE = new RegExp(beforeRE.source + /(\d+)([\+\-])(\d+)/.source + afterRE.s
 function _evaluate(str) {
     indent += indent_mult;
     let ind = ' '.repeat(indent);
-    console.log(`${ind}PARSING -- ${str}`);
+    // console.log(`${ind}PARSING -- ${str}`);
 
     let found;
 
@@ -112,7 +108,7 @@ function _evaluate(str) {
     /* Solve Multiplication and Division */
     found = str.match(multiRE);
     if (found) {
-        console.log(`${ind}${found}`);
+        // console.log(`${ind}${found}`);
         switch (found[2]) {
             case '*':
                 val = parseInt(found[1]) * parseInt(found[3]);
@@ -129,7 +125,7 @@ function _evaluate(str) {
     /* Solve Addition and Subtraction */
     found = str.match(addRE);
     if (found) {
-        console.log(`${ind}${found}`);
+        // console.log(`${ind}${found}`);
         switch (found[2]) {
             case '+':
                 val = parseInt(found[1]) + parseInt(found[3]);
@@ -143,7 +139,7 @@ function _evaluate(str) {
         str = _evaluate(newstr);
     }
 
-    console.log(`${ind}RETURNING -- ${str}`);
+    // console.log(`${ind}RETURNING -- ${str}`);
     indent -= indent_mult;
     return str;
 }

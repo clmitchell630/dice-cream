@@ -35,7 +35,7 @@ test('Dice Range', () => {
   let max = 0;
   let roll;
   for (let i = 0; i < 999; i++) {
-    roll = parseInt(Parser.evalDice("1d20"));
+    roll = parseInt(Parser.evaluate("1d20"));
     min = roll < min ? min = roll : min;
     max = roll > max ? max = roll : max;
   }
@@ -80,10 +80,14 @@ test('Invalid Drop/Keep Syntax', () => {
 
 test('Dice Math', () => {
   let roll;
-  roll = parseInt(Parser.evaluate("1d20+1d20"));
-  expect(roll >= 2 && roll <= 40).toEqual(true);
-  roll = parseInt(Parser.evaluate("100+1d20+1d20"));
-  expect(roll >= 102 && roll <= 140).toEqual(true);
+  for (let i = 0; i < 999; i++) {
+    roll = parseInt(Parser.evaluate("1d20+1d20"));
+    expect(roll >= 2 && roll <= 40).toEqual(true);
+    roll = parseInt(Parser.evaluate("100+1d20+1d20"));
+    expect(roll >= 102 && roll <= 140).toEqual(true);
+    roll = parseInt(Parser.evaluate("100+2d20dl1"));
+    expect(roll >= 101 && roll <= 120).toEqual(true);
+  }
 
   expect(() => { Parser.evaluate("2d20d1") }).toThrow();
   expect(() => { Parser.evaluate("100+2d20d1") }).toThrow();
