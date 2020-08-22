@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 // import React from 'react';
 import NumButton from '../NumButtons/numButton';
 import './calc.scss';
+import * as Parser from '../Parser/parser';
 
 export default class Calculator extends Component {
     constructor(props) {
@@ -21,6 +22,16 @@ export default class Calculator extends Component {
             { screen: this.state.screen + btnValue }
         );
         // document.getElementById("inputVal").setValue("placeholder", this.state.screen + btnValue);
+    }
+
+    evaluate = (event) => {
+        let str = this.state.screen;
+        console.log(`INPUT - ${str}`);
+        let result = Parser.evaluate(str);
+        console.log(`RESULT - ${result}`);
+        this.setState(
+            { screen: result }
+        );
     }
 
     clearField = (event) => {
@@ -52,11 +63,11 @@ export default class Calculator extends Component {
                 <NumButton number="d" handleClick={this.handleClick} />
 
                 <NumButton number="C" handleClick={this.clearField} />
-                <NumButton number="/" className="operator" handleClick={this.math} />
-                <NumButton number="*" className="operator" handleClick={this.math} />
-                <NumButton number="-" className="operator" handleClick={this.math} />
-                <NumButton number="+" className="operator" handleClick={this.math} />
-                <NumButton number="=" className="operator" handleClick={this.math} />
+                <NumButton number="/" className="operator" handleClick={this.handleClick} />
+                <NumButton number="*" className="operator" handleClick={this.handleClick} />
+                <NumButton number="-" className="operator" handleClick={this.handleClick} />
+                <NumButton number="+" className="operator" handleClick={this.handleClick} />
+                <NumButton number="=" className="operator" handleClick={this.evaluate} />
             </section>
         )
     }
