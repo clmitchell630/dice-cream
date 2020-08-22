@@ -8,7 +8,7 @@ export default class Calculator extends Component {
         super(props);
         this.state = {
             screen: "",
-            savedValue:"",
+            savedValue: "",
         };
     }
 
@@ -24,7 +24,7 @@ export default class Calculator extends Component {
     }
 
     clearField = (event) => {
-        this.setState({screen:""});
+        this.setState({ screen: "" });
     }
 
     render() {
@@ -34,34 +34,29 @@ export default class Calculator extends Component {
                     id="inputVal"
                     type="text"
                     value={this.state.screen}
-                    onChange={e => {console.log(this.state.screen); this.setState({ screen: e.target.value })}}
+                    onChange={e => { console.log(this.state.screen); this.setState({ screen: e.target.value }) }}
                     placeholder=""
                     maxLength="64"
                 >
                 </input>
-                <div>
-                    <div className="button-row">
-                        <NumButton number="7" handleClick={this.handleClick} />
-                        <NumButton number="8" handleClick={this.handleClick} />
-                        <NumButton number="9" handleClick={this.handleClick} />
-                    </div>
-                    <div className="button-row">
-                        <NumButton number="4" handleClick={this.handleClick} />
-                        <NumButton number="5" handleClick={this.handleClick} />
-                        <NumButton number="6" handleClick={this.handleClick} />
-                    </div>
-                    <div className="button-row">
-                        <NumButton number="1" handleClick={this.handleClick} />
-                        <NumButton number="2" handleClick={this.handleClick} />
-                        <NumButton number="3" handleClick={this.handleClick} />
-                    </div>
-                    <div className="button-row">
-                        <NumButton number="0" handleClick={this.handleClick} />
-                        <NumButton number="C" handleClick={this.clearField} />
-                        <NumButton number="+" handleClick={this.math} />
+                <NumButton number="7" handleClick={this.handleClick} />
+                <NumButton number="8" handleClick={this.handleClick} />
+                <NumButton number="9" handleClick={this.handleClick} />
+                <NumButton number="4" handleClick={this.handleClick} />
+                <NumButton number="5" handleClick={this.handleClick} />
+                <NumButton number="6" handleClick={this.handleClick} />
+                <NumButton number="1" handleClick={this.handleClick} />
+                <NumButton number="2" handleClick={this.handleClick} />
+                <NumButton number="3" handleClick={this.handleClick} />
+                <NumButton number="0" handleClick={this.handleClick} />
+                <NumButton number="d" handleClick={this.handleClick} />
 
-                    </div>
-                </div>
+                <NumButton number="C" handleClick={this.clearField} />
+                <NumButton number="/" className="operator" handleClick={this.math} />
+                <NumButton number="*" className="operator" handleClick={this.math} />
+                <NumButton number="-" className="operator" handleClick={this.math} />
+                <NumButton number="+" className="operator" handleClick={this.math} />
+                <NumButton number="=" className="operator" handleClick={this.math} />
             </section>
         )
     }
