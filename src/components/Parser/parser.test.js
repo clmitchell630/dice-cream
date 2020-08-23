@@ -93,3 +93,11 @@ test('Dice Math', () => {
   expect(() => { Parser.evaluate("100+2d20d1") }).toThrow();
   expect(() => { Parser.evalDice("100+d20dh1") }).toThrow();
 });
+
+test('RollString', () => {
+  for (let i = 0; i < 5; i++) {
+    let roll = new Parser.RollString("1d20+2d6+5")
+    console.log(roll);
+    console.log(roll.toString());
+  }
+});

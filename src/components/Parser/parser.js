@@ -1,7 +1,79 @@
 
-
 let beforeRE = /(?<=^|[\(\+\-\*\/])/;
 let afterRE = /(?=[\+\-\*\/\)]|$)/;
+let dieRE = /(?<count>\d*)d(?<faces>\d+)(?<dropkeep>(?<dk>[dk])(?<lh>[lh])(?<dknum>\d+))?/;
+let diceMatch = new RegExp(beforeRE.source + dieRE.source + afterRE.source);
+
+export class RollString {
+    constructor(str) {
+        // validate string;
+        str = str.replace(/\s+/g, "").toLowerCase();
+        this.input = str;
+
+        /* 
+        Find the rolls within the string. 
+        Tokenize with '#' and add the Roll to the rolls[]
+        */
+        this.rolls = [];
+        let matched = true;
+        while (matched) {
+            matched = false;
+            str = str.replace(diceMatch, (match, groups, offset, orig) => {
+                matched = true;
+                let roll = new Roll(match);
+                // console.log(`     ${match} -> ${roll.total}`);
+                this.rolls.push(roll);
+                return "#";
+            });
+        }
+        /* Tokenized string corresponding to Rolls in this.rolls */
+        this.outputString = str;
+
+        let idx = 0;
+        str = str.replace(/#/g, (match) => {
+            return this.rolls[idx++].total;
+        });
+        // console.log(str);
+        this.total = evaluate(str);
+    }
+    toString() {
+        let idx = 0;
+        let outStr = this.outputString.replace(/#/g, (match) => {
+            return this.rolls[idx++].total;
+        });
+        return `${this.input} -> ${outStr}`;
+    }
+
+    /*
+    {
+        input: "1d20+2d6+5",
+        rolls: [
+            Roll,
+            Roll,
+            ...
+        ]
+        total: x,
+        outputString: "#+#+5";
+    }
+    */
+}
+
+class Roll {
+    constructor(str) {
+        this.roll = str;
+        this.total = rollDie(str);
+    }
+    /*
+    {
+        roll: "2d6dl1",
+        results: [
+            {value: 6},
+            {value:3, drop:true},
+        ],
+        total:6,
+    }
+    */
+}
 
 let indent = 0;
 let indent_mult = 4;
@@ -14,12 +86,10 @@ export function evaluate(str) {
     if (!!Number(result)) {
         return result;
     } else {
-        throw new Error (`Did not evaluate to a number: '${result}`);
+        throw new Error(`Did not evaluate to a number: '${result}`);
     }
 }
 
-let dieRE = /(?<count>\d*)d(?<faces>\d+)(?<dropkeep>(?<dk>[dk])(?<lh>[lh])(?<dknum>\d+))?/;
-let diceMatch = new RegExp(beforeRE.source + dieRE.source + afterRE.source);
 
 function evalDice(str) {
     str = str.replace(/\s+/g, "");
