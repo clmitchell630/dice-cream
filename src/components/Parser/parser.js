@@ -1,4 +1,6 @@
 
+import Mexp from 'math-expression-evaluator';
+
 let beforeRE = /(?<=^|[\(\+\-\*\/])/;
 let afterRE = /(?=[\+\-\*\/\)]|$)/;
 let dieRE = /(?<count>\d*)d(?<faces>\d+)(?<dropkeep>(?<dk>[dk])(?<lh>[lh])(?<dknum>\d+))?/;
@@ -42,7 +44,7 @@ export class RollString {
         str = str.replace(/#/g, (match) => {
             return this.rolls[idx++].total;
         });
-        this.total = parseInt(evaluate(str));
+        this.total = Mexp.eval(str);
     }
 
     toString() {
@@ -122,106 +124,4 @@ class Roll {
             return acc + cur.value;
         }, 0);
     }
-}
-
-let indent = 0;
-let indent_mult = 4;
-
-export function evaluate(str) {
-    str = str.replace(/\s+/g, "");
-    // console.log(`---- EVAL ---- ${str}`);
-    indent = 0;
-    let result = _evaluate(evalDice(str));
-    if (!!Number(result)) {
-        return result;
-    } else {
-        throw new Error(`Did not evaluate to a number: '${result}`);
-    }
-}
-
-
-function evalDice(str) {
-    str = str.replace(/\s+/g, "");
-    // console.log(`     EVAL DICE ---- ${str}`);
-    let matched = false;
-    /* Replace a matched die string with a rolled die */
-    let remaining = str.replace(diceMatch, (match, groups, offset, orig) => {
-        matched = true;
-        let roll = rollDie(match);
-        // console.log(`     ${match} -> ${roll}`);
-        return roll;
-    });
-    if (matched) {
-        str = evalDice(remaining);
-    } else {
-        // console.log(`No more dice found: '${str}'`);
-        // throw new Error (`Invalid die syntax: '${str}'`);
-    }
-    return str;
-}
-
-
-let parensRE = new RegExp(beforeRE.source + /\([^\(\)]*\)/.source + afterRE.source);
-let multiRE = new RegExp(beforeRE.source + /(\d+)([\*\/])(\d+)/.source + afterRE.source);
-let addRE = new RegExp(beforeRE.source + /(\d+)([\+\-])(\d+)/.source + afterRE.source);
-
-function _evaluate(str) {
-    indent += indent_mult;
-    let ind = ' '.repeat(indent);
-    // console.log(`${ind}PARSING -- ${str}`);
-
-    let found;
-
-    /* Solve Parenthesis */
-    found = str.match(parensRE);
-    if (found) {
-        let firstParen = found.index;
-        let lastParen = found.index + found[0].length - 1;
-        // console.log(`${ind}`, found);
-        if (firstParen >= 0 && lastParen > firstParen) {
-
-            str = str.slice(0, firstParen) + _evaluate(str.slice(firstParen + 1, lastParen)) + str.substr(lastParen + 1);
-            // console.log(`${ind}newstr -- ${str}`);
-            str = _evaluate(str);
-        }
-    }
-
-    let val;
-    /* Solve Multiplication and Division */
-    found = str.match(multiRE);
-    if (found) {
-        // console.log(`${ind}${found}`);
-        switch (found[2]) {
-            case '*':
-                val = parseInt(found[1]) * parseInt(found[3]);
-                break;
-            case '/':
-                val = parseInt(found[1]) / parseInt(found[3]);
-                break;
-        }
-        let newstr = str.slice(0, found.index) + val + str.substr(found.index + found[0].length)
-        // console.log(`${ind}newstr -- ${newstr}`);
-        str = _evaluate(newstr);
-    }
-
-    /* Solve Addition and Subtraction */
-    found = str.match(addRE);
-    if (found) {
-        // console.log(`${ind}${found}`);
-        switch (found[2]) {
-            case '+':
-                val = parseInt(found[1]) + parseInt(found[3]);
-                break;
-            case '-':
-                val = parseInt(found[1]) - parseInt(found[3]);
-                break;
-        }
-        let newstr = str.slice(0, found.index) + val + str.substr(found.index + found[0].length)
-        // console.log(`${ind}newstr -- ${newstr}`);
-        str = _evaluate(newstr);
-    }
-
-    // console.log(`${ind}RETURNING -- ${str}`);
-    indent -= indent_mult;
-    return str;
 }

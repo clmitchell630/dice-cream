@@ -15,14 +15,10 @@ test('Plain Math', () => {
   expect(() => { (new Parser.RollString("2+2()")).total }).toThrow();
 
 
-  /* TODO: Implicit Multiplication */
-  /* Currently throws error */
-  expect(() => { (new Parser.RollString("(5)3+2")).total }).toThrow();
-  /*
-  expect((new Parser.RollString("(5)3+2")).total).toEqual("17");
-  expect((new Parser.RollString("2+(5)3")).total).toEqual("17");
-  expect((new Parser.RollString("2+3(5)")).total).toEqual("17");
-  */
+  /* Implicit Multiplication */
+  expect((new Parser.RollString("(5)3+2")).total).toEqual(17);
+  expect((new Parser.RollString("2+(5)3")).total).toEqual(17);
+  expect((new Parser.RollString("2+3(5)")).total).toEqual(17);
 
   /* Check unbalanced parens */
   expect(() => { (new Parser.RollString("(2+2))")).total }).toThrow();
@@ -39,7 +35,6 @@ test('Dice Range', () => {
     min = roll < min ? min = roll : min;
     max = roll > max ? max = roll : max;
   }
-  console.log(`Min roll = ${min}, Max roll = ${max}`);
   expect(min).toEqual(1);
   expect(max).toEqual(20);
 
@@ -89,7 +84,7 @@ test('Dice Math', () => {
     expect(roll >= 101 && roll <= 120).toEqual(true);
   }
 
-  expect(() => { (new Parser.RollString("2d20d1")).total }).toThrow();
-  expect(() => { (new Parser.RollString("100+2d20d1")).total }).toThrow();
-  expect(() => { Parser.evalDice("100+d20dh1") }).toThrow();
+  expect(() => { new Parser.RollString("2d20d1") }).toThrow();
+  expect(() => { new Parser.RollString("100+2d20d1") }).toThrow();
+  expect(() => { new Parser.RollString("100+d20dh1") }).toThrow();
 });
