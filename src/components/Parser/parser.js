@@ -5,11 +5,20 @@ let dieRE = /(?<count>\d*)d(?<faces>\d+)(?<dropkeep>(?<dk>[dk])(?<lh>[lh])(?<dkn
 let diceMatch = new RegExp(beforeRE.source + dieRE.source + afterRE.source);
 
 export class RollString {
+    /* DATA STRUCTURE
+    {
+        input: "2d6dl1+1d20+5",
+        rolls: [
+            Roll,
+            Roll,
+        ]
+        total: x,
+        outputString: "#+#+5";
+    }
+    */
     constructor(str) {
-        // validate string;
         str = str.replace(/\s+/g, "").toLowerCase();
         this.input = str;
-
         /* 
         Find the rolls within the string. 
         Tokenize with '#' and add the Roll to the rolls[]
@@ -21,7 +30,6 @@ export class RollString {
             str = str.replace(diceMatch, (match, groups, offset, orig) => {
                 matched = true;
                 let roll = new Roll(match);
-                // console.log(`     ${match} -> ${roll.total}`);
                 this.rolls.push(roll);
                 return "#";
             });
@@ -29,13 +37,14 @@ export class RollString {
         /* Tokenized string corresponding to Rolls in this.rolls */
         this.outputString = str;
 
+        /* Insert the rolled values in to the string and evaluate */
         let idx = 0;
         str = str.replace(/#/g, (match) => {
             return this.rolls[idx++].total;
         });
-        // console.log(str);
-        this.total = evaluate(str);
+        this.total = parseInt(evaluate(str));
     }
+
     toString() {
         let idx = 0;
         let outStr = this.outputString.replace(/#/g, (match) => {
@@ -43,36 +52,76 @@ export class RollString {
         });
         return `${this.input} -> ${outStr}`;
     }
-
-    /*
-    {
-        input: "1d20+2d6+5",
-        rolls: [
-            Roll,
-            Roll,
-            ...
-        ]
-        total: x,
-        outputString: "#+#+5";
-    }
-    */
 }
 
 class Roll {
-    constructor(str) {
-        this.roll = str;
-        this.total = rollDie(str);
-    }
-    /*
+    /* DATA STRUCTURE
     {
         roll: "2d6dl1",
+        count: 2
+        faces: 6
         results: [
+            {value: 3, drop:true},
             {value: 6},
-            {value:3, drop:true},
         ],
         total:6,
     }
     */
+    constructor(str) {
+        this.roll = str;
+        this.results = [];
+        this.total = this._rollDie(str, this.results);
+    }
+
+    _rollDie(str, res) {
+        let matches = str.match(diceMatch);
+        this.count = parseInt(matches.groups.count) || 1;
+        this.faces = parseInt(matches.groups.faces);
+        let rolls = [];
+
+        for (let i = 0; i < this.count; i++) {
+            rolls.push(Math.ceil(Math.random() * this.faces));
+        }
+        rolls.sort((a, b) => a - b);
+        rolls.forEach(a => res.push({ value: a }));
+        if (matches.groups.dk) {
+            let dkNum = parseInt(matches.groups.dknum);
+            if (dkNum >= this.count) {
+                /* Can't drop/keep (more than) all the dice! */
+                throw new Error(`Cannot drop/keep '${dkNum}' out of '${this.count}' dice!`);
+            };
+            let start = 0;
+            let end = 0;
+            switch (matches.groups.dk + matches.groups.lh) {
+                case 'dl':
+                    start = 0;
+                    end = dkNum;
+                    break;
+                case 'dh':
+                    start = rolls.length - dkNum;
+                    end = rolls.length;
+                    break;
+                case 'kl':
+                    start = dkNum;
+                    end = rolls.length;
+                    break;
+                case 'kh':
+                    start = 0;
+                    end = rolls.length - dkNum;
+                    break;
+                default:
+                    throw new Error(`Invalid drop/keep`);
+            }
+            for (let i = start; i < end; i++) {
+                res[i].drop = true;
+            }
+        }
+        /* Sum the dice unless they are dropped */
+        return res.reduce((acc, cur) => {
+            if (cur.drop) return acc;
+            return acc + cur.value;
+        }, 0);
+    }
 }
 
 let indent = 0;
@@ -111,43 +160,6 @@ function evalDice(str) {
     return str;
 }
 
-function rollDie(str) {
-    let matches = str.match(diceMatch);
-    // console.log(matches.groups);
-    let count = parseInt(matches.groups.count) || 1;
-    let faces = parseInt(matches.groups.faces);
-    let rolls = [];
-    for (let i = 0; i < count; i++) {
-        rolls.push(Math.ceil(Math.random() * faces));
-    }
-    if (matches.groups.dk) {
-        rolls.sort((a, b) => a - b);
-        // console.log("Sorted Rolls ", rolls);
-        let dkNum = parseInt(matches.groups.dknum);
-        if (dkNum >= count) {
-            /* Can't drop/keep (more than) all the dice! */
-            throw new Error(`Cannot drop/keep '${dkNum}' out of '${count}' dice!`);
-        };
-        switch (matches.groups.dk + matches.groups.lh) {
-            case 'dl':
-                rolls.splice(0, dkNum);
-                break;
-            case 'dh':
-                rolls.splice(0 - dkNum);
-                break;
-            case 'kl':
-                rolls.splice(dkNum);
-                break;
-            case 'kh':
-                rolls.splice(0, rolls.length - dkNum);
-                break;
-            default:
-                throw new Error(`Invalid drop/keep`);
-        }
-    }
-    // console.log("Rolls ", rolls);
-    return rolls.reduce((a, b) => { return a + b; });
-}
 
 let parensRE = new RegExp(beforeRE.source + /\([^\(\)]*\)/.source + afterRE.source);
 let multiRE = new RegExp(beforeRE.source + /(\d+)([\*\/])(\d+)/.source + afterRE.source);

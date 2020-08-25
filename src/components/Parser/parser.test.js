@@ -1,32 +1,32 @@
 import * as Parser from "./parser.js";
 
 test('Plain Math', () => {
-  expect(() => { Parser.evaluate("()") }).toThrow();
-  expect(Parser.evaluate("(3)")).toEqual("3");
-  expect(Parser.evaluate("3*5")).toEqual("15");
-  expect(Parser.evaluate("4*5/2")).toEqual("10");
-  expect(Parser.evaluate("15/3")).toEqual("5");
-  expect(Parser.evaluate("1+2*5+1")).toEqual("12");
-  expect(Parser.evaluate("2+2")).toEqual("4");
-  expect(Parser.evaluate("5*(2+3)")).toEqual("25");
-  expect(Parser.evaluate("10*4-(2*(((4/4))))/2+9")).toEqual("48");
-  expect(Parser.evaluate("((2+(2))*((5)))")).toEqual("20");
-  expect(() => { Parser.evaluate("()2+2") }).toThrow();
-  expect(() => { Parser.evaluate("2+2()") }).toThrow();
+  expect(() => { (new Parser.RollString("()")).total }).toThrow();
+  expect((new Parser.RollString("(3)")).total).toEqual(3);
+  expect((new Parser.RollString("3*5")).total).toEqual(15);
+  expect((new Parser.RollString("4*5/2")).total).toEqual(10);
+  expect((new Parser.RollString("15/3")).total).toEqual(5);
+  expect((new Parser.RollString("1+2*5+1")).total).toEqual(12);
+  expect((new Parser.RollString("2+2")).total).toEqual(4);
+  expect((new Parser.RollString("5*(2+3)")).total).toEqual(25);
+  expect((new Parser.RollString("10*4-(2*(((4/4))))/2+9")).total).toEqual(48);
+  expect((new Parser.RollString("((2+(2))*((5)))")).total).toEqual(20);
+  expect(() => { (new Parser.RollString("()2+2")).total }).toThrow();
+  expect(() => { (new Parser.RollString("2+2()")).total }).toThrow();
 
 
   /* TODO: Implicit Multiplication */
   /* Currently throws error */
-  expect(() => { Parser.evaluate("(5)3+2") }).toThrow();
+  expect(() => { (new Parser.RollString("(5)3+2")).total }).toThrow();
   /*
-  expect(Parser.evaluate("(5)3+2")).toEqual("17");
-  expect(Parser.evaluate("2+(5)3")).toEqual("17");
-  expect(Parser.evaluate("2+3(5)")).toEqual("17");
+  expect((new Parser.RollString("(5)3+2")).total).toEqual("17");
+  expect((new Parser.RollString("2+(5)3")).total).toEqual("17");
+  expect((new Parser.RollString("2+3(5)")).total).toEqual("17");
   */
 
   /* Check unbalanced parens */
-  expect(() => { Parser.evaluate("(2+2))") }).toThrow();
-  expect(() => { Parser.evaluate(")2+2(") }).toThrow();
+  expect(() => { (new Parser.RollString("(2+2))")).total }).toThrow();
+  expect(() => { (new Parser.RollString(")2+2(")).total }).toThrow();
 
 });
 
@@ -35,7 +35,7 @@ test('Dice Range', () => {
   let max = 0;
   let roll;
   for (let i = 0; i < 999; i++) {
-    roll = parseInt(Parser.evaluate("1d20"));
+    roll = (new Parser.RollString("1d20")).total;
     min = roll < min ? min = roll : min;
     max = roll > max ? max = roll : max;
   }
@@ -44,60 +44,52 @@ test('Dice Range', () => {
   expect(max).toEqual(20);
 
   for (let i = 0; i < 999; i++) {
-    roll = parseInt(Parser.evaluate("d20"));
+    roll = (new Parser.RollString("d20")).total;
     expect(roll >= 1 && roll <= 20).toEqual(true);
-    roll = parseInt(Parser.evaluate("1d20"));
+    roll = (new Parser.RollString("1d20")).total;
     expect(roll >= 1 && roll <= 20).toEqual(true);
-    roll = parseInt(Parser.evaluate("2d20dh1"));
+    roll = (new Parser.RollString("2d20dh1")).total;
     expect(roll >= 1 && roll <= 20).toEqual(true);
-    roll = parseInt(Parser.evaluate("2d20dl1"));
+    roll = (new Parser.RollString("2d20dl1")).total;
     expect(roll >= 1 && roll <= 20).toEqual(true);
-    roll = parseInt(Parser.evaluate("2d20kh1"));
+    roll = (new Parser.RollString("2d20kh1")).total;
     expect(roll >= 1 && roll <= 20).toEqual(true);
-    roll = parseInt(Parser.evaluate("2d20kl1"));
+    roll = (new Parser.RollString("2d20kl1")).total;
     expect(roll >= 1 && roll <= 20).toEqual(true);
   }
 });
 
 test('Too Many Drop/Keep', () => {
-  expect(() => { Parser.evaluate("d20dh1") }).toThrow();
-  expect(() => { Parser.evaluate("2d20dh2") }).toThrow();
-  expect(() => { Parser.evaluate("2d20dl2") }).toThrow();
-  expect(() => { Parser.evaluate("2d20kh2") }).toThrow();
-  expect(() => { Parser.evaluate("2d20kl2") }).toThrow();
+  expect(() => { (new Parser.RollString("d20dh1")).total }).toThrow();
+  expect(() => { (new Parser.RollString("2d20dh2")).total }).toThrow();
+  expect(() => { (new Parser.RollString("2d20dl2")).total }).toThrow();
+  expect(() => { (new Parser.RollString("2d20kh2")).total }).toThrow();
+  expect(() => { (new Parser.RollString("2d20kl2")).total }).toThrow();
 });
 
 test('Invalid Drop/Keep Syntax', () => {
-  expect(() => { Parser.evaluate("2d20d1") }).toThrow();
-  expect(() => { Parser.evaluate("2d20k1") }).toThrow();
-  expect(() => { Parser.evaluate("2d20d") }).toThrow();
-  expect(() => { Parser.evaluate("2d20k") }).toThrow();
-  expect(() => { Parser.evaluate("2d20dl") }).toThrow();
-  expect(() => { Parser.evaluate("2d20kl") }).toThrow();
-  expect(() => { Parser.evaluate("2d20dh") }).toThrow();
-  expect(() => { Parser.evaluate("2d20kh") }).toThrow();
+  expect(() => { (new Parser.RollString("2d20d1")).total }).toThrow();
+  expect(() => { (new Parser.RollString("2d20k1")).total }).toThrow();
+  expect(() => { (new Parser.RollString("2d20d")).total }).toThrow();
+  expect(() => { (new Parser.RollString("2d20k")).total }).toThrow();
+  expect(() => { (new Parser.RollString("2d20dl")).total }).toThrow();
+  expect(() => { (new Parser.RollString("2d20kl")).total }).toThrow();
+  expect(() => { (new Parser.RollString("2d20dh")).total }).toThrow();
+  expect(() => { (new Parser.RollString("2d20kh")).total }).toThrow();
 });
 
 test('Dice Math', () => {
   let roll;
   for (let i = 0; i < 999; i++) {
-    roll = parseInt(Parser.evaluate("1d20+1d20"));
+    roll = (new Parser.RollString("1d20+1d20")).total;
     expect(roll >= 2 && roll <= 40).toEqual(true);
-    roll = parseInt(Parser.evaluate("100+1d20+1d20"));
+    roll = (new Parser.RollString("100+1d20+1d20")).total;
     expect(roll >= 102 && roll <= 140).toEqual(true);
-    roll = parseInt(Parser.evaluate("100+2d20dl1"));
+    roll = (new Parser.RollString("100+2d20dl1")).total;
     expect(roll >= 101 && roll <= 120).toEqual(true);
   }
 
-  expect(() => { Parser.evaluate("2d20d1") }).toThrow();
-  expect(() => { Parser.evaluate("100+2d20d1") }).toThrow();
+  expect(() => { (new Parser.RollString("2d20d1")).total }).toThrow();
+  expect(() => { (new Parser.RollString("100+2d20d1")).total }).toThrow();
   expect(() => { Parser.evalDice("100+d20dh1") }).toThrow();
-});
-
-test('RollString', () => {
-  for (let i = 0; i < 5; i++) {
-    let roll = new Parser.RollString("1d20+2d6+5")
-    console.log(roll);
-    console.log(roll.toString());
-  }
 });
