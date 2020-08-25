@@ -6,7 +6,7 @@ let afterRE = /(?=[\+\-\*\/\)]|$)/;
 let dieRE = /(?<count>\d*)d(?<faces>\d+)(?<dropkeep>(?<dk>[dk])(?<lh>[lh])(?<dknum>\d+))?/;
 let diceMatch = new RegExp(beforeRE.source + dieRE.source + afterRE.source);
 
-export class RollString {
+export default class RollString {
     /* DATA STRUCTURE
     {
         input: "2d6dl1+1d20+5",

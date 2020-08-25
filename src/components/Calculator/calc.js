@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import NumButton from '../NumButtons/numButton';
 import History from '../History/history';
 import './calc.scss';
-import * as Parser from '../Parser/parser';
+import RollString from '../Parser/parser';
 
 export default class Calculator extends Component {
     constructor(props) {
@@ -29,7 +29,7 @@ export default class Calculator extends Component {
     evaluate = (event) => {
         let str = this.state.screen;
         console.log(`INPUT - ${str}`);
-        let result = Parser.evaluate(str);
+        let result = (new RollString(str)).total;
         console.log(`RESULT - ${result}`);
         this.setState(
             { screen: result }
