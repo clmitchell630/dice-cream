@@ -19,7 +19,7 @@ export default class RollString {
     }
     */
     constructor(str) {
-        str = str.replace(/\s+/g, "").toLowerCase();
+        str = str.toString().replace(/\s+/g, "").toLowerCase();
         this.input = str;
         /* 
         Find the rolls within the string. 

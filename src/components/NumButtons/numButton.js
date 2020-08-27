@@ -12,7 +12,6 @@ export default class NumButton extends React.Component {
             <div
                 className={`numButton-style ${this.props.className||''}`}
                 value={this.props.number}
-                // onClick={event => { this.props.callback(event); }}
                 onClick={(event) => {this.props.handleClick(event);}}
             >
                 {this.props.number}

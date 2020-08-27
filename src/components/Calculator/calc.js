@@ -11,32 +11,26 @@ export default class Calculator extends Component {
         this.state = {
             screen: "",
             savedValue: "",
-            history: "",
+            history: [],
         };
     }
 
     handleClick = (event) => {
         let btnValue = event.target.getAttribute("value");
-
-        // console.log("button press works!");
-        console.log(btnValue);
         this.setState(prevState => ({
             screen: prevState.screen + btnValue
         }));
-        // document.getElementById("inputVal").setValue("placeholder", this.state.screen + btnValue);
     }
 
     evaluate = (event) => {
         let str = this.state.screen;
         console.log(`INPUT - ${str}`);
-        let result = (new RollString(str)).total;
-        console.log(`RESULT - ${result}`);
-        this.setState(
-            { screen: result }
-        );
+        let result = new RollString(str);
+        console.log(`RESULT - ${result.total}`);
         this.setState(prevState => ({
-            history: [...prevState.history, str]
-          }))
+            screen: result.total,
+            history: [...prevState.history, result],
+        }))
     }
 
     clearField = (event) => {
