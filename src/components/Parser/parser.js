@@ -1,8 +1,8 @@
 
 import Mexp from 'math-expression-evaluator';
 
-let beforeRE = /(?<=^|[\(\+\-\*\/])/;
-let afterRE = /(?=[\+\-\*\/\)]|$)/;
+let beforeRE = /(?<=^|[(+\-*/])/;
+let afterRE = /(?=[+\-*/)]|$)/;
 let dieRE = /(?<count>\d*)d(?<faces>\d+)(?<dropkeep>(?<dk>[dk])(?<lh>[lh])(?<dknum>\d+))?/;
 let diceMatch = new RegExp(beforeRE.source + dieRE.source + afterRE.source);
 
