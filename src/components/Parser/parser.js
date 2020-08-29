@@ -26,16 +26,14 @@ export default class RollString {
         Tokenize with '#' and add the Roll to the rolls[]
         */
         this.rolls = [];
-        let matched = true;
-        while (matched) {
-            matched = false;
-            str = str.replace(diceMatch, (match, groups, offset, orig) => {
-                matched = true;
+        str = str.replace(
+            new RegExp(diceMatch.source, diceMatch.flags + 'g'), /* Add global flag */
+            (match, groups, offset, orig) => {
                 let roll = new Roll(match);
                 this.rolls.push(roll);
                 return "#";
-            });
-        }
+            }
+        );
         /* Tokenized string corresponding to Rolls in this.rolls */
         this.outputString = str;
 
