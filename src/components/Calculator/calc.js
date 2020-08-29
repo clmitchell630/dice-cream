@@ -11,7 +11,12 @@ export default class Calculator extends Component {
         this.state = {
             screen: "",
             savedValue: "",
-            history: [],
+            history: [
+                new RollString("2+2"),
+                new RollString("d20"),
+                new RollString("d20+d6"),
+                new RollString("2d20+2d6+5"),
+              ],
         };
     }
 

@@ -1,0 +1,30 @@
+%shared {
+    padding: 0px 2px;
+    border: 1px solid black;
+}
+.dieRoll {
+    @extend %shared;
+    background: yellow;
+    display: inline-block;
+    position: relative;
+}
+
+.dieRoll:hover .rollTooltip {
+    visibility: visible;
+}
+
+.rollTooltip {
+    @extend %shared;
+    // display: none;
+    visibility: hidden;
+    position: absolute;
+    background: lightblue;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    white-space: nowrap;
+
+    .roll {
+        display: inline-block;
+    }
+}
