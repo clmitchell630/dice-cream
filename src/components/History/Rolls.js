@@ -33,10 +33,9 @@ function getRollTooltip(roll) {
     roll.results.forEach((res, i) => {
         str.push(
             <div className={"roll " + (res.drop ? "drop" : "")}>
-                {res.value}
+                {"".concat(res.value, (i < roll.results.length - 1) ? "+" : "")}
             </div>
         );
-        if (i < roll.results.length - 1) str.push("+");
     });
     return (
         <div
