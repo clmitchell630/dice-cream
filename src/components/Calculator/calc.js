@@ -46,8 +46,8 @@ export default class Calculator extends Component {
 
     render() {
         return (
-            <div>
-                <History history={this.state.history} />
+            <div id="main-container">
+                <History id="history" history={this.state.history} />
                 <section>
                     <input
                         id="inputVal"

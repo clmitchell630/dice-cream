@@ -12,14 +12,14 @@ export default class Roll extends React.Component {
         let roll = this.props.roll;
         return <div
             className="dieRoll"
-            /*
-            onMouseEnter={(e) => {
-                this.setState({ showRolls: true });
-            }}
-            onMouseLeave={(e) => {
-                this.setState({ showRolls: false });
-            }}
-            */
+        /*
+        onMouseEnter={(e) => {
+            this.setState({ showRolls: true });
+        }}
+        onMouseLeave={(e) => {
+            this.setState({ showRolls: false });
+        }}
+        */
         >
             {roll.total}
             {getRollTooltip(roll)}
@@ -31,7 +31,11 @@ export default class Roll extends React.Component {
 function getRollTooltip(roll) {
     let str = [];
     roll.results.forEach((res, i) => {
-        str.push(<div className={"roll " + (res.drop ? "drop" : "")}>{res.value}</div>);
+        str.push(
+            <div className={"roll " + (res.drop ? "drop" : "")}>
+                {res.value}
+            </div>
+        );
         if (i < roll.results.length - 1) str.push("+");
     });
     return (

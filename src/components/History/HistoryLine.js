@@ -19,6 +19,11 @@ export default class HistoryLine extends React.Component {
                 );
             }
         });
-        return lineEle;
+        return (
+            <div>
+                <div className="left" >{lineEle}</div>
+                <div className="right">{line.total}</div>
+            </div>
+        );
     }
 }

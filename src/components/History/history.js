@@ -16,7 +16,7 @@ export default class History extends React.Component {
         console.log("--History Render()--");
         // console.log(this.props.history);
         return (
-            <div>
+            <div id={this.props.id} className="history-wrap">
                 {contents(this.props)}
             </div>
         )
@@ -31,7 +31,7 @@ function contents(props) {
             <ol>
                 {props.history.map((line, idx) => (
                     <li key={idx}>{
-                        <HistoryLine line={line} />
+                        <HistoryLine line={line} key={idx}/>
                     }</li>
                 ))}
             </ol>
