@@ -1,5 +1,5 @@
 import React from 'react';
-import HistoryLine from './HistoryLine';
+import Roll from './Rolls';
 import './history.scss';
 
 export default class History extends React.Component {
@@ -14,29 +14,31 @@ export default class History extends React.Component {
 
     render() {
         console.log("--History Render()--");
-        // console.log(this.props.history);
+
+        let histLines = <span>--NO HISTORY--</span>;
+        if (this.props.history && this.props.history.length > 0) {
+            histLines = [];
+            this.props.history.forEach((line, idx) => {
+                let lineExpr = [];
+                line.outputString.split("#").forEach((s, i) => {
+                    lineExpr.push(s);
+                    if (i < line.rolls.length) {
+                        lineExpr.push(
+                            <Roll roll={line.rolls[i]} />
+                        );
+                    }
+                });
+
+                histLines.push(
+                    <div className="expression" >{lineExpr}</div>,
+                    <div className="result">{line.total}</div>
+                );
+            });
+        }
         return (
             <div id={this.props.id} className="history-wrap">
-                {contents(this.props)}
+                {histLines}
             </div>
         )
     }
-}
-
-
-function contents(props) {
-    let h = <span>--NO HISTORY--</span>;
-    if (props.history && props.history.length > 0) {
-        return (
-            <ol>
-                {props.history.map((line, idx) => (
-                    <li key={idx}>{
-                        <HistoryLine line={line} key={idx}/>
-                    }</li>
-                ))}
-            </ol>
-        );
-    }
-
-    return h;
 }
