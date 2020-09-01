@@ -30,8 +30,11 @@ export default class History extends React.Component {
                 });
 
                 histLines.push(
-                    <div className="expression" >{lineExpr}</div>,
-                    <div className="result">{line.total}</div>
+                    <div className="line">
+                        <div className="input" >{line.input}</div>
+                        <div className="rolled" >{lineExpr}</div>
+                        <div className="result">{line.total}</div>
+                    </div>
                 );
             });
         }

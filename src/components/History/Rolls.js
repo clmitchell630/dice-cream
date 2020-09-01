@@ -10,36 +10,28 @@ export default class Roll extends React.Component {
     render() {
         // console.log(this.props);
         let roll = this.props.roll;
-        return <div
-            className="dieRoll"
-        /*
-        onMouseEnter={(e) => {
-            this.setState({ showRolls: true });
-        }}
-        onMouseLeave={(e) => {
-            this.setState({ showRolls: false });
-        }}
-        */
-        >
-            {roll.total}
-            {getRollTooltip(roll)}
-            {/* {this.state.showRolls ? getRollTooltip(roll) : ""} */}
-        </div>
+        return getExpandedRoll(roll)
     }
 }
 
-function getRollTooltip(roll) {
+function getExpandedRoll(roll) {
     let str = [];
+    str.push("(");
     roll.results.forEach((res, i) => {
         str.push(
-            <div className={"roll " + (res.drop ? "drop" : "")}>
-                {"".concat(res.value, (i < roll.results.length - 1) ? "+" : "")}
-            </div>
+            <span faces={roll.faces} className={"roll " + (res.drop ? "drop" : "")}>
+                {res.value}
+            </span>
         );
+        if (i < roll.results.length - 1) {
+            str.push("+");
+        }
     });
+    str.push(")");
+    return str;
     return (
         <div
-            className="rollTooltip"
+            className="expanded"
             faces={roll.faces}
         >
             {str}

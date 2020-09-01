@@ -16,7 +16,7 @@ export default class Calculator extends Component {
             history: [],
         };
         if (process.env.NODE_ENV === 'development') {
-            process.env.REACT_APP_TEST_HISTORY.split(",").forEach( (r) => {
+            process.env.REACT_APP_TEST_HISTORY.split(",").forEach((r) => {
                 this.state.history.push(new RollString(r));
             });
         }
@@ -32,12 +32,18 @@ export default class Calculator extends Component {
     evaluate = (event) => {
         let str = this.state.screen;
         console.log(`INPUT - ${str}`);
-        let result = new RollString(str);
-        console.log(`RESULT - ${result.total}`);
-        this.setState(prevState => ({
-            screen: result.total,
-            history: [...prevState.history, result],
-        }))
+        let result = "";
+        try {
+            result = new RollString(str);
+            console.log(`RESULT - ${result.total}`);
+            this.setState(prevState => ({
+                screen: result.total,
+                history: [...prevState.history, result],
+            }))
+        } catch (e) {
+            alert(`INVALID EXPRESSION: ${e.message}`);
+            console.log(e);
+        }
     }
 
     clearField = (event) => {
