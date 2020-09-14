@@ -67,6 +67,32 @@ test('Drop/Keep', () => {
     expect(roll[0].value <= roll[1].value && roll[1].drop === true).toEqual(true);
   }
 });
+test('Success Checks', () => {
+  let roll;
+  let successes;
+  for (let i = 0; i < 999; i++) {
+    roll = (new RollString("d20>10")).rolls[0];
+    expect(roll.total).toEqual(roll.results[0].value >= 10 ? 1 : 0);
+    roll = (new RollString("d20<10")).rolls[0];
+    expect(roll.total).toEqual(roll.results[0].value <= 10 ? 1 : 0);
+    roll = (new RollString("d20=10")).rolls[0];
+    expect(roll.total).toEqual(roll.results[0].value = 10 ? 1 : 0);
+
+    roll = (new RollString("2d20d1>10")).rolls[0];
+    successes = 0;
+    roll.results.forEach(r => {
+      successes += r.drop ? 0 : r.value >= 10 ? 1 : 0;
+    })
+    expect(roll.total).toEqual(successes);
+    
+    roll = (new RollString("2d20k1>10")).rolls[0];
+    successes = 0;
+    roll.results.forEach(r => {
+      successes += r.drop ? 0 : r.value >= 10 ? 1 : 0;
+    })
+    expect(roll.total).toEqual(successes);
+  }
+});
 
 test('Too Many Drop/Keep', () => {
   expect(() => { (new RollString("d20dh1")).total }).toThrow();

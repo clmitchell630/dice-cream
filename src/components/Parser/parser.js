@@ -3,8 +3,10 @@ import Mexp from 'math-expression-evaluator';
 
 let beforeRE = /(?<=^|[(+\-*/])/;
 let afterRE = /(?=[+\-*/)]|$)/;
-let dieRE = /(?<count>\d*)d(?<faces>\d+)((?<dk>[dk])(?<lh>[lh])?(?<dknum>\d+))?/;
-let diceMatch = new RegExp(beforeRE.source + dieRE.source + afterRE.source);
+let dkRE = /((?<dk>[dk])(?<lh>[lh])?(?<dknum>\d+))?/;
+let compRE = /((?<comp>[\<\>\=])(?<compval>\d+))?/;
+let dieRE = /(?<count>\d*)d(?<faces>\d+)/;
+let diceMatch = new RegExp(beforeRE.source + dieRE.source + dkRE.source + compRE.source + afterRE.source);
 
 export default class RollString {
     /* DATA STRUCTURE
@@ -120,6 +122,29 @@ class Roll {
             for (let i = start; i < end; i++) {
                 res[i].drop = true;
             }
+        }
+
+        if (matches.groups.comp) {
+            let successes = 0;
+            let target = parseInt(matches.groups.compval);
+            res.forEach(r => {
+                if (!r.drop) {
+                    switch (matches.groups.comp) {
+                        case '<':
+                            successes += r.value <= target ? 1 : 0;
+                            break;
+                        case '>':
+                            successes += r.value >= target ? 1 : 0;
+                            break;
+                        case '=':
+                            successes += r.value = target ? 1 : 0;
+                            break;
+                        default:
+                            throw new Error(`Invalid compare`);
+                    }
+                }
+            });
+            return successes;
         }
         /* Sum the dice unless they are dropped */
         return res.reduce((acc, cur) => {
