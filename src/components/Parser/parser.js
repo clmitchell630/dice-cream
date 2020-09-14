@@ -3,7 +3,7 @@ import Mexp from 'math-expression-evaluator';
 
 let beforeRE = /(?<=^|[(+\-*/])/;
 let afterRE = /(?=[+\-*/)]|$)/;
-let dieRE = /(?<count>\d*)d(?<faces>\d+)(?<dropkeep>(?<dk>[dk])(?<lh>[lh])(?<dknum>\d+))?/;
+let dieRE = /(?<count>\d*)d(?<faces>\d+)((?<dk>[dk])(?<lh>[lh])?(?<dknum>\d+))?/;
 let diceMatch = new RegExp(beforeRE.source + dieRE.source + afterRE.source);
 
 export default class RollString {
@@ -92,7 +92,11 @@ class Roll {
             };
             let start = 0;
             let end = 0;
+            if (matches.groups.lh === undefined) {
+                matches.groups.lh = "";
+            }
             switch (matches.groups.dk + matches.groups.lh) {
+                case 'd':
                 case 'dl':
                     start = 0;
                     end = dkNum;
@@ -105,6 +109,7 @@ class Roll {
                     start = dkNum;
                     end = rolls.length;
                     break;
+                case 'k':
                 case 'kh':
                     start = 0;
                     end = rolls.length - dkNum;

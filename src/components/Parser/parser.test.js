@@ -31,26 +31,40 @@ test('Dice Range', () => {
   let max = 0;
   let roll;
   for (let i = 0; i < 999; i++) {
-    roll = (new RollString("1d20")).total;
+    roll = (new RollString("d20")).total;
     min = roll < min ? min = roll : min;
     max = roll > max ? max = roll : max;
   }
   expect(min).toEqual(1);
   expect(max).toEqual(20);
 
+  min = 100000;
+  max = 0;
   for (let i = 0; i < 999; i++) {
-    roll = (new RollString("d20")).total;
-    expect(roll >= 1 && roll <= 20).toEqual(true);
-    roll = (new RollString("1d20")).total;
-    expect(roll >= 1 && roll <= 20).toEqual(true);
-    roll = (new RollString("2d20dh1")).total;
-    expect(roll >= 1 && roll <= 20).toEqual(true);
-    roll = (new RollString("2d20dl1")).total;
-    expect(roll >= 1 && roll <= 20).toEqual(true);
-    roll = (new RollString("2d20kh1")).total;
-    expect(roll >= 1 && roll <= 20).toEqual(true);
-    roll = (new RollString("2d20kl1")).total;
-    expect(roll >= 1 && roll <= 20).toEqual(true);
+    roll = (new RollString("2d20")).total;
+    min = roll < min ? min = roll : min;
+    max = roll > max ? max = roll : max;
+  }
+  expect(min).toEqual(2);
+  expect(max).toEqual(40);
+});
+
+test('Drop/Keep', () => {
+  let roll;
+  for (let i = 0; i < 999; i++) {
+    roll = (new RollString("2d20d1")).rolls[0].results;
+    expect(roll[0].value <= roll[1].value && roll[0].drop === true).toEqual(true);
+    roll = (new RollString("2d20dl1")).rolls[0].results;
+    expect(roll[0].value <= roll[1].value && roll[0].drop === true).toEqual(true);
+    roll = (new RollString("2d20dh1")).rolls[0].results;
+    expect(roll[0].value <= roll[1].value && roll[1].drop === true).toEqual(true);
+
+    roll = (new RollString("2d20k1")).rolls[0].results;
+    expect(roll[0].value <= roll[1].value && roll[0].drop === true).toEqual(true);
+    roll = (new RollString("2d20kh1")).rolls[0].results;
+    expect(roll[0].value <= roll[1].value && roll[0].drop === true).toEqual(true);
+    roll = (new RollString("2d20kl1")).rolls[0].results;
+    expect(roll[0].value <= roll[1].value && roll[1].drop === true).toEqual(true);
   }
 });
 
@@ -63,8 +77,6 @@ test('Too Many Drop/Keep', () => {
 });
 
 test('Invalid Drop/Keep Syntax', () => {
-  expect(() => { (new RollString("2d20d1")).total }).toThrow();
-  expect(() => { (new RollString("2d20k1")).total }).toThrow();
   expect(() => { (new RollString("2d20d")).total }).toThrow();
   expect(() => { (new RollString("2d20k")).total }).toThrow();
   expect(() => { (new RollString("2d20dl")).total }).toThrow();
@@ -83,8 +95,13 @@ test('Dice Math', () => {
     roll = (new RollString("100+2d20dl1")).total;
     expect(roll >= 101 && roll <= 120).toEqual(true);
   }
-
-  expect(() => { new RollString("2d20d1") }).toThrow();
-  expect(() => { new RollString("100+2d20d1") }).toThrow();
-  expect(() => { new RollString("100+d20dh1") }).toThrow();
 });
+
+/* test("Dice Reroll", () => {
+  let roll;
+  for (let i = 0; i < 999; i++) {
+    roll = (new RollString("d6r1")).total;
+    expect(roll != 1).toEqual(true);
+  }
+
+}) */
