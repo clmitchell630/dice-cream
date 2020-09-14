@@ -3,10 +3,11 @@ import Mexp from 'math-expression-evaluator';
 
 let beforeRE = /(?<=^|[(+\-*/])/;
 let afterRE = /(?=[+\-*/)]|$)/;
+let rerollRE = /((?<reroll>r)(?<rerollop>[\<\>])?(?<rerollnum>\d+))*/;
 let dkRE = /((?<dk>[dk])(?<lh>[lh])?(?<dknum>\d+))?/;
 let compRE = /((?<comp>[\<\>\=])(?<compval>\d+))?/;
 let dieRE = /(?<count>\d*)d(?<faces>\d+)/;
-let diceMatch = new RegExp(beforeRE.source + dieRE.source + dkRE.source + compRE.source + afterRE.source);
+let diceMatch = new RegExp(beforeRE.source + dieRE.source + rerollRE.source + dkRE.source + compRE.source + afterRE.source);
 
 export default class RollString {
     /* DATA STRUCTURE
@@ -81,8 +82,55 @@ class Roll {
         this.faces = parseInt(matches.groups.faces);
         let rolls = [];
 
-        for (let i = 0; i < this.count; i++) {
-            rolls.push(Math.ceil(Math.random() * this.faces));
+        let rerollPattern = /(?<reroll>r)(?<rerollop>[\<\>])?(?<rerollnum>\d+)/g;
+        let rerollValues = new Set();
+        for (let reroll of str.matchAll(rerollPattern)) {
+            let start;
+            let end;
+            let rerollnum = parseInt(reroll.groups.rerollnum);
+            switch (reroll.groups.rerollop) {
+                case '<':
+                    if (rerollnum < 1 || rerollnum >= this.faces) {
+                        throw new Error(`Reroll number out of range: '${rerollnum}`);
+                    }
+                    start = 1;
+                    end = rerollnum;
+                    break;
+                case '>':
+                    if (rerollnum < 1 || rerollnum >= this.faces) {
+                        throw new Error(`Reroll number out of range: '${rerollnum}`);
+                    }
+                    start = rerollnum;
+                    end = this.faces;
+                    break;
+                case undefined:
+                    if (rerollnum < 1 || rerollnum > this.faces) {
+                        throw new Error(`Reroll number out of range: '${rerollnum}`);
+                    }
+                    start = end = rerollnum;
+                    break;
+                default:
+                    throw new Error(`Invalid reroll operator '${reroll.groups.rerollop}`);
+                    break;
+            }
+            for (let i = start; i <= end; i++) {
+                rerollValues.add(i);
+            }
+        }
+        let sum = [...rerollValues].reduce((t, x) => {
+            return t + x;
+        });
+        let dieTotal = this.faces / 2 * (1 + this.faces);
+        if (sum >= dieTotal) {
+            throw new Error(`Invalid reroll range`);
+        }
+
+        while (rolls.length < this.count) {
+            let rollval;
+            do {
+                rollval = Math.ceil(Math.random() * this.faces);
+            } while (rerollValues.has(rollval));
+            rolls.push(rollval);
         }
         rolls.sort((a, b) => a - b);
         rolls.forEach(a => res.push({ value: a }));

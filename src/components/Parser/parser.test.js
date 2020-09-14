@@ -67,6 +67,25 @@ test('Drop/Keep', () => {
     expect(roll[0].value <= roll[1].value && roll[1].drop === true).toEqual(true);
   }
 });
+
+test('Reroll', () => {
+  let min = 100000;
+  let max = 0;
+  let roll;
+  for (let i = 0; i < 999; i++) {
+    roll = new RollString("d20r1").rolls[0];
+    expect(roll.total >= 2 && roll.total <= 20).toEqual(true);
+    roll = new RollString("4d10r1r3r5r7r9");
+    expect(roll.total % 2).toEqual(0);
+  };
+  
+  expect(() => { new RollString("d20r<20") }).toThrow();
+  expect(() => { new RollString("d20r<30") }).toThrow();
+  expect(() => { new RollString("d20r>1") }).toThrow();
+  expect(() => { new RollString("d20r>0") }).toThrow();
+  expect(() => { new RollString("d6r1r2r3r4r5r6") }).toThrow();
+});
+
 test('Success Checks', () => {
   let roll;
   let successes;
@@ -84,7 +103,7 @@ test('Success Checks', () => {
       successes += r.drop ? 0 : r.value >= 10 ? 1 : 0;
     })
     expect(roll.total).toEqual(successes);
-    
+
     roll = (new RollString("2d20k1>10")).rolls[0];
     successes = 0;
     roll.results.forEach(r => {
