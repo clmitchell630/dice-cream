@@ -84,45 +84,49 @@ class Roll {
 
         let rerollPattern = /(?<reroll>r)(?<rerollop>[\<\>])?(?<rerollnum>\d+)/g;
         let rerollValues = new Set();
+        let hasRerolls = false;
         for (let reroll of str.matchAll(rerollPattern)) {
+            hasRerolls = true;
             let start;
             let end;
             let rerollnum = parseInt(reroll.groups.rerollnum);
             switch (reroll.groups.rerollop) {
                 case '<':
                     if (rerollnum < 1 || rerollnum >= this.faces) {
-                        throw new Error(`Reroll number out of range: '${rerollnum}`);
+                        throw new Error(`Reroll number out of range: '${rerollnum}'`);
                     }
                     start = 1;
                     end = rerollnum;
                     break;
                 case '>':
                     if (rerollnum < 1 || rerollnum >= this.faces) {
-                        throw new Error(`Reroll number out of range: '${rerollnum}`);
+                        throw new Error(`Reroll number out of range: '${rerollnum}'`);
                     }
                     start = rerollnum;
                     end = this.faces;
                     break;
                 case undefined:
                     if (rerollnum < 1 || rerollnum > this.faces) {
-                        throw new Error(`Reroll number out of range: '${rerollnum}`);
+                        throw new Error(`Reroll number out of range: '${rerollnum}'`);
                     }
                     start = end = rerollnum;
                     break;
                 default:
-                    throw new Error(`Invalid reroll operator '${reroll.groups.rerollop}`);
+                    throw new Error(`Invalid reroll operator '${reroll.groups.rerollop}'`);
                     break;
             }
             for (let i = start; i <= end; i++) {
                 rerollValues.add(i);
             }
         }
-        let sum = [...rerollValues].reduce((t, x) => {
-            return t + x;
-        });
-        let dieTotal = this.faces / 2 * (1 + this.faces);
-        if (sum >= dieTotal) {
-            throw new Error(`Invalid reroll range`);
+        if (hasRerolls) {
+            let sum = [...rerollValues].reduce((t, x) => {
+                return t + x;
+            });
+            let dieTotal = this.faces / 2 * (1 + this.faces);
+            if (sum >= dieTotal) {
+                throw new Error(`Invalid reroll range`);
+            }
         }
 
         while (rolls.length < this.count) {
