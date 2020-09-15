@@ -84,7 +84,9 @@ class Roll {
 
         let rerollPattern = /(?<reroll>r)(?<rerollop>[\<\>])?(?<rerollnum>\d+)/g;
         let rerollValues = new Set();
+        let hasRerolls = false;
         for (let reroll of str.matchAll(rerollPattern)) {
+            hasRerolls = true;
             let start;
             let end;
             let rerollnum = parseInt(reroll.groups.rerollnum);
@@ -117,12 +119,14 @@ class Roll {
                 rerollValues.add(i);
             }
         }
-        let sum = [...rerollValues].reduce((t, x) => {
-            return t + x;
-        });
-        let dieTotal = this.faces / 2 * (1 + this.faces);
-        if (sum >= dieTotal) {
-            throw new Error(`Invalid reroll range`);
+        if (hasRerolls) {
+            let sum = [...rerollValues].reduce((t, x) => {
+                return t + x;
+            });
+            let dieTotal = this.faces / 2 * (1 + this.faces);
+            if (sum >= dieTotal) {
+                throw new Error(`Invalid reroll range`);
+            }
         }
 
         while (rolls.length < this.count) {

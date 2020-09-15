@@ -32,18 +32,18 @@ test('Dice Range', () => {
   let roll;
   for (let i = 0; i < 999; i++) {
     roll = (new RollString("d20")).total;
-    min = roll < min ? min = roll : min;
-    max = roll > max ? max = roll : max;
+    min = roll < min ? roll : min;
+    max = roll > max ? roll : max;
   }
   expect(min).toEqual(1);
   expect(max).toEqual(20);
 
   min = 100000;
   max = 0;
-  for (let i = 0; i < 999; i++) {
+  for (let i = 0; i < 9999; i++) {
     roll = (new RollString("2d20")).total;
-    min = roll < min ? min = roll : min;
-    max = roll > max ? max = roll : max;
+    min = roll < min ? roll : min;
+    max = roll > max ? roll : max;
   }
   expect(min).toEqual(2);
   expect(max).toEqual(40);
@@ -69,16 +69,48 @@ test('Drop/Keep', () => {
 });
 
 test('Reroll', () => {
-  let min = 100000;
-  let max = 0;
+  let min;
+  let max;
   let roll;
+
+  min = 100000;
+  max = 0;
   for (let i = 0; i < 999; i++) {
     roll = new RollString("d20r1").rolls[0];
     expect(roll.total >= 2 && roll.total <= 20).toEqual(true);
+    min = roll.total < min ? roll.total : min;
+    max = roll.total > max ? roll.total : max;
+  }
+  expect(min).toEqual(2);
+  expect(max).toEqual(20);
+
+  min = 100000;
+  max = 0;
+  for (let i = 0; i < 999; i++) {
+    roll = new RollString("d20r<10").rolls[0];
+    expect(roll.total >= 10 && roll.total <= 20).toEqual(true);
+    min = roll.total < min ? roll.total : min;
+    max = roll.total > max ? roll.total : max;
+  }
+  expect(min).toEqual(11);
+  expect(max).toEqual(20);
+
+  min = 100000;
+  max = 0;
+  for (let i = 0; i < 999; i++) {
+    roll = new RollString("d20r>10").rolls[0];
+    expect(roll.total >= 1 && roll.total <= 9).toEqual(true);
+    min = roll.total < min ? roll.total : min;
+    max = roll.total > max ? roll.total : max;
+  }
+  expect(min).toEqual(1);
+  expect(max).toEqual(9);
+
+  for (let i = 0; i < 999; i++) {
     roll = new RollString("4d10r1r3r5r7r9");
     expect(roll.total % 2).toEqual(0);
   };
-  
+
   expect(() => { new RollString("d20r<20") }).toThrow();
   expect(() => { new RollString("d20r<30") }).toThrow();
   expect(() => { new RollString("d20r>1") }).toThrow();
